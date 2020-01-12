@@ -86,13 +86,3 @@ module applyHingeCorner(position = [0,0,0], rotation = [0,0,0], r = 3, cornerHei
     children([2:$children-1]);
   }
 }
-
-cubes = [20,15,5];
-pieces = 3;
-tolerance = 0.5;
-applyHingeCorner([0,0,0], [0,0,0], cubes[2]*0.7, cubes[2], cubes[0], pieces, tolerance) {
-  translate([0,tolerance/2,0])
-  cube(cubes);
-  translate(-[0,cubes[1] + tolerance/2,0])
-  cube(cubes);
-}
