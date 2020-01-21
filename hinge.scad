@@ -1,3 +1,7 @@
+// A library to create print-in-place horizontal hinges.
+//
+// Example:
+
 module bottomWedge(r, d, rodH, tolerance, other) {
   wedgeH = (r + tolerance) * sin(45);
   wedgeBottom = max(r + tolerance, d);
@@ -84,5 +88,24 @@ module applyHingeCorner(position = [0,0,0], rotation = [0,0,0], r = 3, cornerHei
   }
   if ($children > 2) {
     children([2:$children-1]);
+  }
+}
+
+module applyHinges(positions, rotations, sides, r, cornerHeight, hingeLength, pieces, tolerance) {
+  for (i = [0 : $children - 1]) {
+    difference() {
+      children(i)
+      for (j = [0 : len(positions) - 1]) {
+        if (sides[j][0] == i || sides[j][1] == i) {
+          translate(positions[j])
+          rotate([0,0, rotations[j]])
+          hingeCorner(r, cornerHeight, hingeLength, pieces, sides[j][0] == i, true, tolerance);
+        }
+      }
+    }
+    for (j = [0 : len(positions) - 1]) {
+      rotate([0,0, rotations[j]])
+      hingeCorner(r, cornerHeight, hingeLength, pieces, sides[j][0] == i, false, tolerance);      
+    }
   }
 }
