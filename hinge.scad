@@ -1,7 +1,6 @@
 // A library to create print-in-place horizontal hinges.
 //
 // Example:
-
 module bottomWedge(r, d, rodH, tolerance, other) {
   wedgeH = (r + tolerance) * sin(45);
   wedgeBottom = max(r + tolerance, d);
@@ -26,16 +25,19 @@ module hingeRodNegative(r, d, h, tolerance, tip, other) {
       }
       if (tip) {
         translate([0,0,h])
-        cylinder(r = r, h = tolerance);
+        cylinder(r = r, h = tolerance + 0.01);
         translate([0,0,h + tolerance])
-        cylinder(r1 = r, r2 = 0, h = d/2 - tolerance);
+        cylinder(r1 = r, r2 = 0, h = r + tolerance);
+      } else {
+        translate([0,0,h])
+        cylinder(r = r + tolerance, h = tolerance / 2);
       }
     }
     translate([
-      -tolerance/2,
+      -tolerance/2 - 0.01,
       other ? -r - tolerance : 0,
-      0])
-    cube([h + tolerance, r + tolerance, 2*r]);
+      -0.01])
+    cube([h + tolerance + + 0.02 + (tip ? r + tolerance * 1.5 : 0), r + tolerance, d + r + tolerance + 0.02]);
   }
 }
 
@@ -55,13 +57,13 @@ module hingeRod(r, d, h, tip, dip, tolerance, negative, other) {
           bottomWedge(r, d, rodH, 0, !other);
         }
         if (tip) {
-          translate([0,0,h - toleranceTip])
-          cylinder(r1 = r, r2 = 0, h = r - tolerance);
+          translate([0,0,h - toleranceTip - 0.01])
+          cylinder(r1 = r, r2 = 0, h = r + 0.01);
         }
       }
       if (dip) {
-        translate([0,0,toleranceDip])
-        cylinder(r1 = r, r2 = 0, h = r - tolerance);
+        translate([0,0,toleranceDip-0.01])
+        cylinder(r1 = r, r2 = 0, h = r + tolerance);
       }
     }
   }
@@ -115,3 +117,66 @@ module applyHinges(positions, rotations, r, cornerHeight, hingeLength, pieces, t
     }
   }
 }
+
+module negativeExtraAngle(position, rotation, cornerHeight, centerHeight, hingeLength, pieces, tolerance, other, angle) {
+  translate(position)
+  rotate(rotation) {
+    startAtFirst = !other;
+    l = (cornerHeight + tolerance - centerHeight) / tan(90-angle / 2);
+    for (i = [1 : pieces]) {
+      if (i % 2 == (startAtFirst ? 0 : 1)) {
+        dip = i != 1;
+        w = hingeLength / pieces + (dip ? 1 : 0.5) * tolerance;
+        positionX = (i - 1) * hingeLength / pieces + (dip ? -tolerance / 2 : 0);
+        difference() {
+          translate([ positionX, 0, centerHeight])
+          rotate([other ? -angle : angle, 0, 0])
+          translate([0, other ? -l : 0, -centerHeight])
+          cube([w, l, cornerHeight + tolerance]);
+          
+          translate([positionX - 0.01, other ? -cornerHeight + 0.01 : -0.01, 0])
+          cube([w + 0.02, cornerHeight, 2 * cornerHeight]);
+          
+          diffY = norm([l, cornerHeight + tolerance]);
+          translate([positionX - 0.01, other? -0.01 : -diffY - 2 * tolerance + 0.01, cornerHeight + 0.01])
+          cube([w + 0.02, diffY + 2 * tolerance, diffY]);
+        }
+      }    
+    }
+  }
+}
+
+module applyExtraAngle(positions, rotations, cornerHeight, centerHeight, hingeLength, pieces, tolerance, angle) {
+  difference() {
+    children();
+    for (j = [0 : 1 : len(positions) - 1]) {
+      negativeExtraAngle(positions[j], rotations[j], cornerHeight, centerHeight, hingeLength, pieces, tolerance, false, angle);
+      negativeExtraAngle(positions[j], rotations[j], cornerHeight, centerHeight, hingeLength, pieces, tolerance, true, angle);
+    }
+  }
+}
+/*
+difference() {
+  union() {
+    translate([-5,0.5,0])
+    cube([70,60,7]);
+    translate([-5,-60.5,0])
+    cube([70,60,7]);
+  }
+  hingeCorner(7/2, 7/2, 60, 6, true, true, 0.5);
+  negativeExtraAngle([0,0,0], [0,0,0], 7/2, 7/2, 50, 5, 0.5, false, 30);
+  hingeCorner(7/2, 7/2, 60, 6, false, true, 0.5);
+  negativeExtraAngle([0,0,0], [0,0,0], 6/2, 6/2, 50, 5, 0.5, false, 30);
+}
+hingeCorner(7/2, 7/2, 60, 6, true, false, 0.5);
+hingeCorner(7/2, 7/2, 60, 6, false, false, 0.5);
+*/
+
+/*
+difference() {
+  translate([-5,-60.5,0])
+  cube([70,60,7]);
+  negativeExtraAngle([0,0,0], [0,0,0], 7, 3.5, 60, 5, 0.5, false, 120);
+  hingeCorner(3.5, 3.5, 60, 5, false, true, 0.5);
+}
+*/
