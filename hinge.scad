@@ -1,6 +1,26 @@
 // A library to create print-in-place horizontal hinges.
 //
-// Example:
+// Copyright (c) 2020 Rodrigo Chandia (rodrigo.chandia@gmail.com)
+// All rights reserved.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//
+// The contents of this file are DUAL-LICENSED.  You may modify and/or
+// redistribute this software according to the terms of one of the
+// following two licenses (at your option):
+//
+// License 1: Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+//            https://creativecommons.org/licenses/by-sa/4.0/
+//
+// License 2: GNU General Public License (GPLv3)
+//            https://www.gnu.org/licenses/gpl-3.0.en.html
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. https://www.gnu.org/licenses/
+//
+
 module bottomWedge(r, d, rodH, tolerance, other) {
   wedgeH = (r + tolerance) * sin(45);
   wedgeBottom = max(r + tolerance, d);
@@ -155,7 +175,9 @@ module applyExtraAngle(positions, rotations, cornerHeight, centerHeight, hingeLe
     }
   }
 }
-/*
+/* 
+Examples:
+
 difference() {
   union() {
     translate([-5,0.5,0])
