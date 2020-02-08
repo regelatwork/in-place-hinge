@@ -176,29 +176,67 @@ module applyExtraAngle(positions, rotations, cornerHeight, centerHeight, hingeLe
   }
 }
 /* 
-Examples:
+// Examples:
 
+// For each of these examples we position the cubes where we are placing the hinges separated by tolerance = 0.5.
+// This can be adjusted according to how precise is your printer.
+// Of course you do not need to use two cubes, this can be applied to complex parts.
+
+// An inset hinge manually made with hingeCorner(). It allows for 90 degrees of bend approx.
 difference() {
+  union() {
+    translate([0,0.5,0])
+    cube([60,60,7]);
+    translate([0,-60.5,0])
+    cube([60,60,7]);
+  }
+  hingeCorner(7/2, 7/2, 60, 6, true, true, 0.5);
+  negativeExtraAngle([0,0,0], [0,0,0], 7, 7/2, 60, 6, 0.5, true, 90);
+  hingeCorner(7/2, 7/2, 60, 6, false, true, 0.5);
+  negativeExtraAngle([0,0,0], [0,0,0], 7, 7/2, 60, 6, 0.5, false, 90);
+}
+hingeCorner(7/2, 7/2, 60, 6, true, false, 0.5);
+hingeCorner(7/2, 7/2, 60, 6, false, false, 0.5);
+
+// Same as before but with apply*() functions.
+applyHinges([[0,0,0]], [0], 7/2, 7/2, 60, 6, 0.5)
+applyExtraAngle([[0,0,0]], [0], 7, 7/2, 60, 6, 0.5, 90)
+  union() {
+    translate([0,0.5,0])
+    cube([60,60,7]);
+    translate([0,-60.5,0])
+    cube([60,60,7]);
+  }
+
+// Half a hinge, 120 degrees of bend approx.
+difference() {
+  union () {
+    translate([0,-60.5,0])
+    cube([60,60,7]);
+  }
+  negativeExtraAngle([0,0,0], [0,0,0], 7, 3.5, 60, 5, 0.5, false, 120);
+  hingeCorner(3.5, 3.5, 60, 5, false, true, 0.5);
+}
+hingeCorner(7/2, 7/2, 60, 5, false, false, 0.5);
+
+// A hinge on the corner. This kind of hinge allows 180 degrees of rotation. No need for extra angle.
+// Unlike the previous ones, the boxes do not need to be as long as the hinge.
+// Note: Keep r <= cornerHeight.
+applyHinges([[0,0,0]], [0], 7/2, 7, 60, 6, 0.5)
   union() {
     translate([-5,0.5,0])
     cube([70,60,7]);
     translate([-5,-60.5,0])
     cube([70,60,7]);
   }
-  hingeCorner(7/2, 7/2, 60, 6, true, true, 0.5);
-  negativeExtraAngle([0,0,0], [0,0,0], 7/2, 7/2, 50, 5, 0.5, false, 30);
-  hingeCorner(7/2, 7/2, 60, 6, false, true, 0.5);
-  negativeExtraAngle([0,0,0], [0,0,0], 6/2, 6/2, 50, 5, 0.5, false, 30);
-}
-hingeCorner(7/2, 7/2, 60, 6, true, false, 0.5);
-hingeCorner(7/2, 7/2, 60, 6, false, false, 0.5);
-*/
 
-/*
+// Half a hinge on the corner. As before, half hinges require manual use of hingeCorner.
 difference() {
-  translate([-5,-60.5,0])
-  cube([70,60,7]);
-  negativeExtraAngle([0,0,0], [0,0,0], 7, 3.5, 60, 5, 0.5, false, 120);
-  hingeCorner(3.5, 3.5, 60, 5, false, true, 0.5);
+  union () {
+    translate([-5,-60.5,0])
+    cube([70,60,7]);
+  }
+  hingeCorner(3.5, 7, 60, 5, false, true, 0.5);
 }
+hingeCorner(7/2, 7, 60, 5, false, false, 0.5);
 */
